@@ -490,12 +490,59 @@ const Processing: React.FC<{ onDone: () => void }> = ({ onDone }) => {
   );
 };
 
+/* ─── AI Complete Document Modal ─── */
+const DocModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4">
+    <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in duration-200">
+      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#E8F5F0', color: '#1B5E4B' }}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Dr. Servín 5.2 - Interpretación Completa</h2>
+            <p className="text-sm text-gray-500">Documento analítico generado en tiempo real por IA Clínica</p>
+          </div>
+        </div>
+        <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div className="p-8 overflow-y-auto space-y-6 bg-gray-50/50">
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <h3 className="text-sm font-bold text-gray-800 uppercase tracking-widest mb-4 pb-2 border-b border-gray-50">Resumen Evolutivo de la Paciente</h3>
+          <p className="text-sm text-gray-700 leading-relaxed text-justify">
+            Durante la consulta de seguimiento del 28 de Febrero de 2026, la paciente <strong>Lorena Arzate Aguilar</strong> presenta una notable mejoría en la sintomatología de su <em>síndrome doloroso crónico lumbar</em>, con una disminución del dolor reportada en un 60%, lo que ha favorecido una recuperación en sus ciclos biológicos y mejor calidad de sueño reparador. Se confirma una excelente adherencia al régimen alimenticio indicado en consultas previas, logrando una reducción sistemática de factores inflamatorios endógenos. Esto se ha reflejado directamente en la estabilización de los marcadores asociados a su <em>hipotiroidismo subclínico</em>.
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <h3 className="text-sm font-bold text-gray-800 uppercase tracking-widest mb-4 pb-2 border-b border-gray-50">Fundamentación Homeopática y Miasmática</h3>
+          <p className="text-sm text-gray-700 leading-relaxed text-justify mb-4">
+            A nivel miasmático, predomina un patrón psórico en remisión evidente (50%), con un fondo sycósico atenuado. Se opta por incrementar progresivamente la potencia de <strong>Sulphur a 200C</strong> en tomas semanales debido a la contundente respuesta vital observada hacia la exteriorización de síntomas cutáneos pasajeros, lo cual es interpretado como signo de muy buen pronóstico clínico según la Ley de Hering.
+          </p>
+          <p className="text-sm text-gray-700 leading-relaxed text-justify">
+            Adicionalmente, se incorpora <strong>Nux Vomica (30C)</strong> como remedio complementario para contrarrestar el componente de estrés laboral residual reportado por la paciente, ayudando simultáneamente en el reequilibrio gástrico e intestinal provocado por la "Gastritis funcional" ocasional, asegurando así que no se obstaculice la asimilación del remedio principal. El pronóstico a mediano plazo es altamente favorable, manteniendo las pautas de movilidad dinámica suave ajustadas a su tolerancia actual. Este caso evidencia un excelente progreso hacia el bienestar holístico sostenible.
+          </p>
+        </div>
+      </div>
+      <div className="px-6 py-4 border-t border-gray-100 bg-white flex justify-end">
+        <button onClick={onClose} className="px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-md transition-all hover:scale-[1.02] active:scale-95" style={{ backgroundColor: '#1B5E4B' }}>
+          Cerrar e ir al expediente
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 /* ─── Step 4: Review & Approve ─── */
 const Review: React.FC = () => {
   const [sections, setSections] = useState(initialSections);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [docModalOpen, setDocModalOpen] = useState(false);
 
   const updateStatus = (id: string, status: SectionStatus) => {
     setSections(prev => prev.map(s => s.id === id ? { ...s, status } : s));
@@ -699,7 +746,8 @@ const Review: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 p-8 space-y-5 pb-28">
+      <main className="flex-1 p-8 space-y-5 pb-28 relative">
+        {docModalOpen && <DocModal onClose={() => setDocModalOpen(false)} />}
 
         {/* ── Historial Clínico ── */}
         <div className={`bg-white rounded-xl border-2 shadow-sm overflow-hidden transition-colors ${getSectionBorder(sections[0].status)}`}>
@@ -707,6 +755,14 @@ const Review: React.FC = () => {
             <div className="flex items-center gap-3">
               <span className="text-xl">📋</span>
               <h2 className="text-base font-semibold text-gray-900">Historial Clínico</h2>
+              <button 
+                onClick={() => setDocModalOpen(true)}
+                className="ml-3 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-1.5"
+                style={{ backgroundColor: '#F0F9FF', color: '#0369A1', border: '1px solid #BAE6FD', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                Leer interpretación completa Dr. Servín 5.2
+              </button>
             </div>
             {getStatusBadge(sections[0].status)}
           </div>
